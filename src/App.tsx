@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Communicate } from 'edge-tts-universal/browser'
 import { AudioPlayer, EmptyOutput } from './AudioPlayer'
+import { canUseBrowserTts, isDesktopApp, synthesizeSpeech } from './tts'
 import { DEFAULT_VOICE, VOICES, type StaticVoice } from './voices'
 import './App.css'
 
@@ -8,10 +8,6 @@ const MAX_CHARS = 5000
 const DEFAULT_RATE = 0
 const DEFAULT_PITCH = 0
 const DEFAULT_VOLUME = 0
-
-function isMicrosoftEdge(): boolean {
-  return /Edg\//.test(navigator.userAgent)
-}
 
 function formatPercent(value: number): string {
   const sign = value >= 0 ? '+' : ''
@@ -51,7 +47,8 @@ function trackTitleFromText(value: string): string {
 
 function App() {
   const [text, setText] = useState('')
-  const [isEdge] = useState(() => isMicrosoftEdge())
+  const [isDesktop] = useState(() => isDesktopApp())
+  const [needsEdge] = useState(() => !isDesktopApp() && !canUseBrowserTts())
   const [voice, setVoice] = useState(DEFAULT_VOICE)
   const [rate, setRate] = useState(DEFAULT_RATE)
   const [pitch, setPitch] = useState(DEFAULT_PITCH)
@@ -129,8 +126,10 @@ function App() {
       setError(`Keep it under ${MAX_CHARS.toLocaleString()} characters.`)
       return
     }
-    if (!isEdge) {
-      setError('Please open this page in Microsoft Edge to create your audio.')
+    if (!isDesktop && needsEdge) {
+      setError(
+        'Please open this page in Microsoft Edge, or use the desktop app to create your audio.',
+      )
       return
     }
 
@@ -139,46 +138,16 @@ function App() {
     setProgress(2)
 
     try {
-      const communicate = new Communicate(trimmed, {
-        voice,
-        rate: formatPercent(rate),
-        pitch: formatPitch(pitch),
-        volume: formatPercent(volume),
-      })
-
-      const audioParts: BlobPart[] = []
-      const totalChars = Math.max(1, trimmed.replace(/\s+/g, '').length)
-      let spokenChars = 0
-      let lastShown = 2
-
-      for await (const chunk of communicate.stream()) {
-        if (chunk.type === 'audio' && chunk.data) {
-          audioParts.push(Uint8Array.from(chunk.data))
-          if (lastShown < 8) {
-            lastShown = 8
-            setProgress(8)
-          }
-        }
-
-        if (
-          (chunk.type === 'WordBoundary' || chunk.type === 'SentenceBoundary') &&
-          chunk.text
-        ) {
-          spokenChars += chunk.text.replace(/\s+/g, '').length
-          const next = Math.min(95, Math.max(8, Math.round((spokenChars / totalChars) * 100)))
-          if (next > lastShown) {
-            lastShown = next
-            setProgress(next)
-          }
-        }
-      }
-
-      if (audioParts.length === 0) {
-        throw new Error('No audio was generated. Please try again.')
-      }
-
-      setProgress(100)
-      const blob = new Blob(audioParts, { type: 'audio/mpeg' })
+      const blob = await synthesizeSpeech(
+        {
+          text: trimmed,
+          voice,
+          rate: formatPercent(rate),
+          pitch: formatPitch(pitch),
+          volume: formatPercent(volume),
+        },
+        setProgress,
+      )
       const url = URL.createObjectURL(blob)
       setTrackTitle(trackTitleFromText(trimmed))
       setTrackVoice(selected)
@@ -213,10 +182,10 @@ function App() {
         </p>
       </header>
 
-      {!isEdge && (
+      {needsEdge && (
         <div className="notice" role="status" data-testid="edge-notice">
-          For the best experience, open this page in <strong>Microsoft Edge</strong>.
-          You can explore voices and settings here; audio creation works in Edge.
+          For the best experience, open this page in <strong>Microsoft Edge</strong>,
+          or run the desktop app. You can explore voices and settings here either way.
         </div>
       )}
 
