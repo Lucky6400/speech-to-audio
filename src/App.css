@@ -1,17 +1,18 @@
 .app {
-  width: min(640px, 100%);
+  width: min(1120px, 100%);
   margin: 0 auto;
   padding: 2.5rem 1.25rem 3rem;
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .header {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  max-width: 40rem;
 }
 
 .brand {
@@ -24,7 +25,7 @@
 }
 
 .header h1 {
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
   letter-spacing: -0.03em;
   margin: 0;
   line-height: 1.15;
@@ -44,6 +45,36 @@
   color: var(--text-h);
   font-size: 0.95rem;
   line-height: 1.4;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.9fr);
+    gap: 1.5rem;
+  }
+
+  .output-panel {
+    position: sticky;
+    top: 1.25rem;
+  }
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.output-panel {
+  min-width: 0;
 }
 
 .field {
@@ -69,7 +100,7 @@
   padding: 0.75rem 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: var(--surface);
   color: var(--text-h);
   font: inherit;
   line-height: 1.45;
@@ -109,13 +140,14 @@
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: var(--surface);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 .voice-option {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
   gap: 0.65rem;
   width: 100%;
   padding: 0.55rem 0.7rem;
@@ -135,7 +167,6 @@
 
 .voice-option-locale {
   flex: 0 0 auto;
-  min-width: 3.5rem;
   color: var(--text);
   font-size: 0.85rem;
 }
@@ -148,7 +179,7 @@
   padding: 0.85rem 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: var(--surface);
   color: var(--text-h);
   font: inherit;
   line-height: 1.45;
@@ -299,48 +330,235 @@
   cursor: not-allowed;
 }
 
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+.progress-label {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
 .error {
   margin: 0;
   color: #b91c1c;
   font-size: 0.95rem;
 }
 
-.result {
+.output-empty,
+.now-playing {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
+  align-items: center;
+  gap: 1rem;
+  padding: 1.75rem 1.35rem 1.5rem;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(45, 212, 191, 0.22), transparent 45%),
+    radial-gradient(circle at 90% 20%, rgba(16, 185, 129, 0.18), transparent 40%),
+    #121212;
+  color: #f3f4f6;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  min-height: 420px;
 }
 
-.result h2 {
-  font-size: 1.1rem;
+.output-empty h2,
+.np-title {
   margin: 0;
+  color: #fff;
+  text-align: center;
 }
 
-.result-note {
+.output-empty h2 {
+  font-size: 1.2rem;
+}
+
+.output-empty p {
   margin: 0;
-  color: var(--text);
+  color: #a3a3a3;
+  text-align: center;
+  max-width: 16rem;
+  line-height: 1.4;
+}
+
+.output-empty-art,
+.np-cover {
+  width: min(100%, 240px);
+  aspect-ratio: 1;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(145deg, #134e4a 0%, #0f766e 45%, #115e59 100%);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.output-empty-art span {
+  font-size: 4rem;
+  opacity: 0.85;
+}
+
+.np-cover-letter {
+  font-size: 5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1;
+}
+
+.np-bars {
+  position: absolute;
+  bottom: 1rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 28px;
+  opacity: 0.55;
+}
+
+.np-bars span {
+  width: 5px;
+  border-radius: 999px;
+  background: #fff;
+  height: 30%;
+}
+
+.np-bars.active span {
+  animation: eq 0.9s ease-in-out infinite;
+}
+
+.np-bars.active span:nth-child(1) {
+  animation-delay: 0s;
+}
+.np-bars.active span:nth-child(2) {
+  animation-delay: 0.15s;
+  height: 55%;
+}
+.np-bars.active span:nth-child(3) {
+  animation-delay: 0.3s;
+  height: 80%;
+}
+.np-bars.active span:nth-child(4) {
+  animation-delay: 0.45s;
+  height: 40%;
+}
+
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.45);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.np-meta {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.np-eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a3a3a3;
+}
+
+.np-title {
+  font-size: 1.15rem;
+  line-height: 1.25;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.np-artist {
+  margin: 0;
+  color: #a3a3a3;
   font-size: 0.95rem;
 }
 
-.result audio {
+.np-timeline {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.download {
+.np-seek {
+  width: 100%;
+  accent-color: #1db954;
+  cursor: pointer;
+}
+
+.np-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #a3a3a3;
+  font-variant-numeric: tabular-nums;
+}
+
+.np-controls {
+  display: flex;
+  justify-content: center;
+}
+
+.np-play {
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #121212;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.np-play:hover {
+  transform: scale(1.06);
+}
+
+.np-download {
   display: inline-flex;
-  align-self: flex-start;
+  margin-top: 0.25rem;
   padding: 0.65rem 1.1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  color: var(--text-h);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-.download:hover {
-  background: var(--accent-bg);
-  border-color: var(--accent-border);
+.np-download:hover {
+  background: rgba(255, 255, 255, 0.08);
 }

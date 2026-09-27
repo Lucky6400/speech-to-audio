@@ -27,6 +27,7 @@ export const VOICES: StaticVoice[] = [
   { id: 'es-MX-DaliaNeural', label: 'Dalia (Female)', locale: 'es-MX' },
   { id: 'fr-FR-DeniseNeural', label: 'Denise (Female)', locale: 'fr-FR' },
   { id: 'de-DE-KatjaNeural', label: 'Katja (Female)', locale: 'de-DE' },
+  { id: 'de-DE-ConradNeural', label: 'Conrad (Male)', locale: 'de-DE' },
   { id: 'ja-JP-NanamiNeural', label: 'Nanami (Female)', locale: 'ja-JP' },
   { id: 'zh-CN-XiaoxiaoNeural', label: 'Xiaoxiao (Female)', locale: 'zh-CN' },
 ]
